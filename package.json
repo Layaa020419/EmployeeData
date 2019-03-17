@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "oldstart": "ng build && node ./bin/www",
-    "start": "ng build && node start.js",
+    "start": "node start.js",
     "devClient": "ng build --watch",
     "devServer": "nodemon --inspect start.js",
     "build": "ng build",

@@ -14,7 +14,8 @@ export class SocketService {
     private socket;
 
     public initSocket(): void {
-        this.socket = socketIo(SERVER_URL);//test without specifying URL later - it takes default host url this app runs on - it seems
+        //this.socket = socketIo(SERVER_URL);//test without specifying URL later - it takes default host url this app runs on - it seems
+		this.socket = socketIo();
     }
 
     public send(message: Message): void {
