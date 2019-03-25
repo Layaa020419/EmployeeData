@@ -40,6 +40,14 @@ router.post('/voicecommand', function (req, res, next) {
 				filterString = stringPropertyManipulation(property, parameters, filterString, true);
 				console.log(filterString);
 				break;
+				case "Salary":
+				filterString = salaryManipulation(property, parameters, filterString, 'amount');
+				console.log(filterString);
+				break;
+				case "Experience":
+				filterString = salaryManipulation(property, parameters, filterString, 'amount');
+				console.log(filterString);
+				break;
 			case "All":
 				filterString = {};
 				break;
@@ -59,11 +67,64 @@ router.post('/voicecommand', function (req, res, next) {
 	res.send({ "fulfillmentText": "Sure", "fulfillmentMessages": [{ "text": { "text": ["Sure"] } }], "source": "webhook sample" });
 });
 
+function experienceManipulation(property, parameters, filterString){
+
+}
+
+function salaryManipulation(property, parameters, filterString, propertyTag) {
+	var tempStringFilter = {};
+	switch (parameters.numCompare) {
+		case 'lesser':
+			tempStringFilter = []
+			if (Array.isArray(parameters[property])) {
+				parameters[property].forEach(prop => {
+					//assuming single array - more than one value on lesser/greater alone is not right
+					tempStringFilter = { [property]: { $lt: prop[propertyTag] } };
+				});
+			}
+			else {
+				tempStringFilter = { [property]: { $lt: parameters[property][propertyTag] } };
+			}
+			break;
+		case 'greater':
+			if (Array.isArray(parameters[property])) {
+				parameters[property].forEach(prop => {
+					//assuming single array - more than one value on lesser/greater alone is not right
+					tempStringFilter = { [property]: { $gt: prop[propertyTag] } };
+				});
+			}
+			else {
+				tempStringFilter = { [property]: { $gt: parameters[property][propertyTag] } };
+			}
+			break;
+		case 'between':
+			//has to be array of two values
+			if (parameters[property][0] > parameters[property][1]) {
+				tempStringFilter = {
+					[property]: {
+						$lt: parameters[property][0][propertyTag],
+						$gt: parameters[property][1][propertyTag]
+					}
+				};
+			}
+			else {
+				tempStringFilter = {
+					[property]: {
+						$lt: parameters[property][1][propertyTag],
+						$gt: parameters[property][0][propertyTag]
+					}
+				};
+			}
+			break;
+	}
+	return Object.assign({}, filterString, tempStringFilter);
+}
+
 function stringPropertyManipulation(property, parameters, filterString, matchWholeWord) {
 
 	var tempStringFilter = {};
 	if (Array.isArray(parameters[property])) {
-		var tempStringFilter = { '$or': [] };
+		tempStringFilter = { '$or': [] };
 
 		parameters[property].forEach(name => {
 			if (matchWholeWord) {
